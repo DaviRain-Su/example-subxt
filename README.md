@@ -54,3 +54,8 @@ Error: Rpc(Request("{\"jsonrpc\":\"2.0\",\"error\":{\"code\":1010,\"message\":\"
 
 ```
 
+This bug can be fix, the author subxt have give answer.
+This relate issue: https://github.com/paritytech/subxt/issues/338
+
+update subxt git rep to : subxt = { version = "0.15.0", git = "https://github.com/paritytech/subxt.git", rev = "a701d80e24fdc" }
+

@@ -43,7 +43,6 @@ pub mod polkadot {}
 // }
 
 // can pass
-//
 // #[async_std::main]
 // async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //     env_logger::init();
@@ -71,35 +70,35 @@ pub mod polkadot {}
 //     Ok(())
 // }
 
-
 // cannot pass
 
-#[async_std::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    env_logger::init();
-
-    let signer = PairSigner::new(AccountKeyring::Dave.pair());
-    let dest = AccountKeyring::Eve.to_account_id().into();
-
-    let api = ClientBuilder::new()
-        .build()
-        .await?
-        .to_runtime_api::<polkadot::RuntimeApi<polkadot::DefaultConfig>>();
-
-    let hash = api
-        .tx()
-        .balances()
-        .transfer(dest, 10_000)
-        .sign_and_submit(&signer)
-        .await?;
-
-    println!("Balance transfer extrinsic submitted: {}", hash);
-
-    Ok(())
-}
-
-// cannot pass
+// #[async_std::main]
+// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//     env_logger::init();
 //
+//     let signer = PairSigner::new(AccountKeyring::Dave.pair());
+//     let dest = AccountKeyring::Eve.to_account_id().into();
+//
+//     let api = ClientBuilder::new()
+//         // .set_url("ws://127.0.0.1:9944")
+//         .build()
+//         .await?
+//         .to_runtime_api::<polkadot::RuntimeApi<polkadot::DefaultConfig>>();
+//
+//     let hash = api
+//         .tx()
+//         .balances()
+//         .transfer(dest, 10_000)
+//         .sign_and_submit(&signer)
+//         .await?;
+//
+//     println!("Balance transfer extrinsic submitted: {}", hash);
+//
+//     Ok(())
+// }
+
+// cannot pass
+
 // #[async_std::main]
 // async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //     env_logger::init();
@@ -126,39 +125,39 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //     Ok(())
 // }
 //
-// #[async_std::main]
-// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//     env_logger::init();
-//
-//     let signer = PairSigner::new(AccountKeyring::Alice.pair());
-//     let dest = AccountKeyring::Bob.to_account_id().into();
-//     println!("dest: {}", dest);
-//
-//     let api = ClientBuilder::new()
-//         .build()
-//         .await?
-//         .to_runtime_api::<polkadot::RuntimeApi<polkadot::DefaultConfig>>();
-//
-//     let sub = api.client.rpc().subscribe_events().await?;
-//     let decoder = api.client.events_decoder();
-//     let mut sub = EventSubscription::<polkadot::DefaultConfig>::new(sub, decoder);
-//     sub.filter_event::<polkadot::balances::events::Transfer>();
-//
-//     api.tx()
-//         .balances()
-//         .transfer(dest, 10_000)
-//         .sign_and_submit(&signer)
-//         .await?;
-//
-//     let raw = sub.next().await.unwrap().unwrap();
-//     let event = <polkadot::balances::events::Transfer as codec::Decode>::decode(
-//         &mut &raw.data[..],
-//     );
-//     if let Ok(e) = event {
-//         println!("Balance transfer success: value: {:?}", e.2);
-//     } else {
-//         println!("Failed to subscribe to Balances::Transfer Event");
-//     }
-//     Ok(())
-// }
+#[async_std::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
+
+    let signer = PairSigner::new(AccountKeyring::Alice.pair());
+    let dest = AccountKeyring::Bob.to_account_id().into();
+    println!("dest: {}", dest);
+
+    let api = ClientBuilder::new()
+        .build()
+        .await?
+        .to_runtime_api::<polkadot::RuntimeApi<polkadot::DefaultConfig>>();
+
+    let sub = api.client.rpc().subscribe_events().await?;
+    let decoder = api.client.events_decoder();
+    let mut sub = EventSubscription::<polkadot::DefaultConfig>::new(sub, decoder);
+    sub.filter_event::<polkadot::balances::events::Transfer>();
+
+    api.tx()
+        .balances()
+        .transfer(dest, 10_000)
+        .sign_and_submit(&signer)
+        .await?;
+
+    let raw = sub.next().await.unwrap().unwrap();
+    let event = <polkadot::balances::events::Transfer as codec::Decode>::decode(
+        &mut &raw.data[..],
+    );
+    if let Ok(e) = event {
+        println!("Balance transfer success: value: {:?}", e.2);
+    } else {
+        println!("Failed to subscribe to Balances::Transfer Event");
+    }
+    Ok(())
+}
 
