@@ -6,9 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-subxt = { version = "0.24.0", git = "https://github.com/octopus-network/substrate-subxt.git" }
+subxt = { version = "0.27.1", git = "https://github.com/paritytech/subxt.git" }
+mmr-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 tokio = { version = "1.8", features = ["rt-multi-thread", "macros", "time"] }
-sp-keyring = "6.0.0"
+sp-keyring = "18.0.0"
+sp-core = "16.0.0"
 futures = "0.3.13"
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive", "full", "bit-vec"] }
 hex = "0.4.3"

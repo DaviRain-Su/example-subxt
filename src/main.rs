@@ -1,38 +1,18 @@
 
-use sp_keyring::AccountKeyring;
+// use sp_keyring::AccountKeyring;
 use subxt::{
-    tx::PairSigner,
+    // tx::PairSigner,
     OnlineClient,
-    PolkadotConfig,
+    PolkadotConfig, rpc_params,
 };
-use std::time::Duration;
-use futures::StreamExt;
+// use std::time::Duration;
+// use futures::StreamExt;
+use subxt::rpc::types::BlockNumber;
+use mmr_rpc::LeavesProof;
 
 #[subxt::subxt(runtime_metadata_path = "metadata/metadata.scale")]
-pub mod barancle {}
-//
-//#[tokio::main]
-//async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//    tracing_subscriber::fmt::init();
-//
-//    let signer = PairSigner::new(AccountKeyring::Alice.pair());
-//    let dest = AccountKeyring::Bob.to_account_id().into();
-//
-//    // Create a client to use:
-//    let api = OnlineClient::<PolkadotConfig>::from_url("ws://127.0.0.1:9944").await?;
-//
-//    // Create a transaction to submit:
-//    let tx = barancle::tx()
-//        .balances()
-//        .transfer(dest, 123_456_789_012_345);
-//
-//    // Submit the transaction with default params:
-//    let hash = api.tx().sign_and_submit_default(&tx, &signer).await?;
-//
-//    println!("Balance transfer extrinsic submitted: {}", hash);
-//
-//    Ok(())
-//}
+// #[subxt::subxt(runtime_metadata_url = "wss://rococo-rpc.polkadot.io:443")]
+pub mod polkadot {}
 
 /// Subscribe to all events, and then manually look through them and
 /// pluck out the events that we care about.
@@ -43,62 +23,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a client to use:
     let api = OnlineClient::<PolkadotConfig>::new().await?;
 
-    // Subscribe to any events that occur:
-    let mut event_sub = api.events().subscribe().await?;
+    let address = polkadot::storage().system().account_root();
 
-    // While this subscription is active, balance transfers are made somewhere:
-    tokio::task::spawn({
-        let api = api.clone();
-        async move {
-            let signer = PairSigner::new(AccountKeyring::Alice.pair());
-            let mut transfer_amount = 1_000_000_000;
+    let mut iter = api.storage().at(None).await?.iter(address, 10).await?;
 
-            // Make small balance transfers from Alice to Bob in a loop:
-            loop {
-                let transfer_tx = barancle::tx().balances().transfer(
-                        AccountKeyring::Bob.to_account_id().into(),
-                transfer_amount,
-                );
-                api.tx()
-                .sign_and_submit_default(&transfer_tx, &signer)
-                .await
-                .unwrap();
-
-                tokio::time::sleep(Duration::from_secs(10)).await;
-                transfer_amount += 100_000_000;
-            }
-        }
-    });
-
-    // Our subscription will see the events emitted as a result of this:
-    while let Some(events) = event_sub.next().await {
-        let events = events?;
-        let block_hash = events.block_hash();
-
-        // We can dynamically decode events:
-        println!("  Dynamic event details: {block_hash:?}:");
-        for event in events.iter() {
-            let event = event?;
-            let is_balance_transfer = event
-            .as_event::<barancle::balances::events::Transfer>()?
-            .is_some();
-            let pallet = event.pallet_name();
-            let variant = event.variant_name();
-            println!(
-                    "    {pallet}::{variant} (is balance transfer? {is_balance_transfer})"
-            );
-        }
-
-        // Or we can find the first transfer event, ignoring any others:
-        let transfer_event =
-        events.find_first::<barancle::balances::events::Transfer>()?;
-
-        if let Some(ev) = transfer_event {
-            println!("  - Balance transfer success: value: {:?}", ev.amount);
-        } else {
-            println!("  - No balance transfer event found in this block");
-        }
+    while let Some((key, account)) = iter.next().await? {
+        println!("{}: {}", hex::encode(key), account.data.free);
     }
+
+    let header_result: sp_core::H256  = api.rpc().request("beefy_getFinalizedHead", rpc_params![]).await?;
+    println!("beefy_getFinalizedHead is {:?}", header_result);
+    
+    let method = "mmr_generateProof";
+    // let block_numner: Vec<BlockNumber> = vec![0u32.into(),1u32.into(), 2u32.into()];
+    // let block_numner: Vec<BlockNumber> = vec![4007966u32.into(),4007967u32.into(),4007968u32.into()];
+    let block_numner: Vec<BlockNumber> = vec![30u64.into()];
+    let best_known_block_number = Option::<BlockNumber>::None;
+    let at = Option::<sp_core::H256>::None;
+    let params = rpc_params![block_numner, best_known_block_number, at];
+    let result: LeavesProof<sp_core::H256> = api.rpc().request(method, params).await?;
+    println!("mmr_generateProof is {:?}", result);
+
 
     Ok(())
 }
