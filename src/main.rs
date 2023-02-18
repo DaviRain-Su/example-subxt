@@ -31,9 +31,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("{}: {}", hex::encode(key), account.data.free);
     }
 
+    // test beefy_getFinalizedHead
     let header_result: sp_core::H256  = api.rpc().request("beefy_getFinalizedHead", rpc_params![]).await?;
     println!("beefy_getFinalizedHead is {:?}", header_result);
     
+
+    // test mmr_generateProof
     let method = "mmr_generateProof";
     // let block_numner: Vec<BlockNumber> = vec![0u32.into(),1u32.into(), 2u32.into()];
     // let block_numner: Vec<BlockNumber> = vec![4007966u32.into(),4007967u32.into(),4007968u32.into()];
