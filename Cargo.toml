@@ -6,12 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-subxt = { version = "0.27.1", git = "https://github.com/paritytech/subxt.git" }
-mmr-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
+subxt = { git = "https://github.com/paritytech/subxt.git", branch = "master"}
+mmr-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.40" }
 tokio = { version = "1.8", features = ["rt-multi-thread", "macros", "time"] }
-sp-keyring = "18.0.0"
-sp-core = "16.0.0"
+sp-keyring = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.40" }
+sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.40" }
 futures = "0.3.13"
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive", "full", "bit-vec"] }
 hex = "0.4.3"
+sp-mmr-primitives = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.40" }
 tracing-subscriber = "0.3.11"
+hex-literal = "0.3.1"
+beefy-light-client = { git = "https://github.com/octopus-network/beefy-light-client.git", branch = "polkadot-v0.9.40" }
