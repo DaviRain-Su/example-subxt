@@ -17,4 +17,6 @@ hex = "0.4.3"
 sp-mmr-primitives = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.40" }
 tracing-subscriber = "0.3.11"
 hex-literal = "0.3.1"
-beefy-light-client = { git = "https://github.com/octopus-network/beefy-light-client.git", branch = "polkadot-v0.9.40" }
+beefy-light-client = { git = "https://github.com/octopus-network/beefy-light-client.git"}
+serde = "1.0"
+serde_derive = "1.0"
