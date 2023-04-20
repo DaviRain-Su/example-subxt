@@ -98,13 +98,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .await?;
         assert!(mmr_verify_proof_stateless_result);
         println!("-------------------------------------------------------------------");
-        // -------------- ---------------------------------------
-        // let encode_leaves: Vec<EncodableOpaqueLeaf> =
-        //     Decode::decode(&mut &leaves_proof_result.leaves[..]).unwrap();
-        // for item in encode_leaves.into_iter() {
-        //     let leaf = beefy_light_client::mmr::MmrLeaf::decode(&mut &item.0[..]);
-        //     println!("leaf: {leaf:?}");
-        // }
         let mmr_leafs =
             beefy_light_client::mmr::decode_mmr_leaves(leaves_proof_result.leaves[..].to_vec());
         println!("mmr_leafs: {mmr_leafs:?}");
